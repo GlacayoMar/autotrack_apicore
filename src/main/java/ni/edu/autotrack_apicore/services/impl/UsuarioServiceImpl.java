@@ -19,7 +19,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public Usuario crear(Usuario usuario) {
 
-        if (usuarioRepository.existsByCorreo(usuario.getEmail())) {
+        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
             throw new IllegalArgumentException(
                     "El correo ya se encuentra registrado");
         }

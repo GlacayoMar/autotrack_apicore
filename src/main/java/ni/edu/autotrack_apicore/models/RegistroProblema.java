@@ -11,7 +11,5 @@ import lombok.Setter;
 @Table(name = "registros_problema")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class RegistroProblema extends Registro{
 }
