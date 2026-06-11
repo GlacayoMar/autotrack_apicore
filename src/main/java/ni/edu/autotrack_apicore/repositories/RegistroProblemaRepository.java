@@ -9,6 +9,11 @@ import java.util.List;
 
 @Repository
 public interface RegistroProblemaRepository extends JpaRepository<RegistroProblema,Long> {
-    List<RegistroProblema> findByVehiculoId(Long vehiculoId);
-    List<RegistroProblema> findByActivoTrue();
+    List<RegistroProblema> findByVehiculoIdOrderByFechaRegistroDesc(Long vehiculoId);
+
+    // Obtiene solo los problemas que siguen abiertos (activo = true) de un carro
+    List<RegistroProblema> findByVehiculoIdAndActivoTrue(Long vehiculoId);
+
+    // Cuenta cuántos problemas graves e irresolutos (activos y que afectan al vehículo) tiene el carro
+    long countByVehiculoIdAndActivoTrueAndAfectaVehiculoTrue(Long vehiculoId);
 }

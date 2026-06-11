@@ -17,10 +17,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class Registro extends EntidadBase {
-    @Column(name = "fecha_registro")
+    @Column(name = "fecha_registro", nullable = false)
     private LocalDate fechaRegistro;
 
-    @Column(name = "nota")
+    @Column(name = "nota", length = 500)
     private String nota;
 
     @ManyToOne (fetch = FetchType.LAZY)

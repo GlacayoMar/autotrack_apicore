@@ -43,6 +43,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Usuario> listar() {
         return usuarioRepository.findAll();
     }
@@ -51,6 +52,11 @@ public class UsuarioServiceImpl implements UsuarioService {
     public Usuario actualizar(Long id, Usuario usuarioActualizado) {
 
         Usuario usuario = obtenerPorId(id);
+
+        if (!usuarioActualizado.getEmail().equals(usuario.getEmail())
+                && usuarioRepository.existsByEmail(usuarioActualizado.getEmail())) {
+            throw new IllegalArgumentException("El correo ya se encuentra registrado");
+        }
 
         usuario.setNombres(usuarioActualizado.getNombres());
         usuario.setApellidos(usuarioActualizado.getApellidos());
@@ -63,9 +69,6 @@ public class UsuarioServiceImpl implements UsuarioService {
     public void eliminar(Long id) {
 
         Usuario usuario = obtenerPorId(id);
-
         usuario.setActivo(false);
-
-        usuarioRepository.save(usuario);
     }
 }

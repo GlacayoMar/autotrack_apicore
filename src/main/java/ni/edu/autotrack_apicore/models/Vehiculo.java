@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ni.edu.autotrack_apicore.models.base.EntidadBase;
+import ni.edu.autotrack_apicore.models.enums.Estado;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +36,9 @@ public class Vehiculo extends EntidadBase {
     @Column(name = "vin_vehiculo", nullable = false, length = 50)
     private String vin;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado_vehiculo", nullable = false, length = 30)
-    private String estado;
+    private Estado estado;
 
     @ElementCollection
     @CollectionTable(
