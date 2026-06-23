@@ -44,10 +44,9 @@ public class RegistroServiceImpl implements RegistroService {
     @Override
     @Transactional
     public void eliminar(Long id) {
-        // Al usar JOINED, borrar el padre aquí eliminará automáticamente la fila en la tabla hija en cascada
-        if (!registroRepository.existsById(id)) {
-            throw new EntityNotFoundException("No se puede eliminar. Registro no encontrado.");
-        }
-        registroRepository.deleteById(id);
+        Registro registro = registroRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("No se puede eliminar. Registro no encontrado."));
+
+        registroRepository.delete(registro);
     }
 }

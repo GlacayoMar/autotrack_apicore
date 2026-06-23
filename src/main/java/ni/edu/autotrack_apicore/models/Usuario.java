@@ -1,12 +1,16 @@
 package ni.edu.autotrack_apicore.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ni.edu.autotrack_apicore.models.base.EntidadBase;
+import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.SoftDeleteType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,6 +22,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SoftDelete(columnName = "eliminado", strategy = SoftDeleteType.ACTIVE)
 public class Usuario extends EntidadBase {
 
     @Column(name = "nombre_usuario", nullable = false, length = 50)
@@ -42,6 +47,34 @@ public class Usuario extends EntidadBase {
     private String pais;
 
     @OneToMany(mappedBy = "usuario")
+    @JsonManagedReference
     private List<Vehiculo> vehiculos;
+
+    @OneToMany(
+            mappedBy = "usuario",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @JsonManagedReference
+    private List<Multa> multas = new ArrayList<>();
+
+    @OneToOne(
+            mappedBy = "usuario",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
+    @JsonManagedReference
+    private Licencia licencia;
+
+    @OneToMany(
+            mappedBy = "usuario",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @JsonManagedReference
+    private List<Notificacion> notificaciones = new ArrayList<>();
 }
 

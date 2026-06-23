@@ -3,6 +3,7 @@ package ni.edu.autotrack_apicore.services.impl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import ni.edu.autotrack_apicore.models.Usuario;
+import ni.edu.autotrack_apicore.models.Vehiculo;
 import ni.edu.autotrack_apicore.repositories.UsuarioRepository;
 import ni.edu.autotrack_apicore.services.UsuarioService;
 import org.springframework.stereotype.Service;
@@ -61,14 +62,19 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setNombres(usuarioActualizado.getNombres());
         usuario.setApellidos(usuarioActualizado.getApellidos());
         usuario.setEmail(usuarioActualizado.getEmail());
+        usuario.setNumeroTel(usuarioActualizado.getNumeroTel());
+        usuario.setPais(usuarioActualizado.getPais());
+        usuario.setUsername(usuarioActualizado.getUsername());
 
         return usuarioRepository.save(usuario);
     }
 
     @Override
+    @Transactional
     public void eliminar(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
 
-        Usuario usuario = obtenerPorId(id);
-        usuario.setActivo(false);
+        usuarioRepository.delete(usuario);
     }
 }

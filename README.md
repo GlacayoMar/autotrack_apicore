@@ -57,6 +57,7 @@ ni.edu.autotrack_apicore/
 └── services/             # Capa de Negocio: Interfaces y lógica de implementaciones (impl/).
     ├── impl/             # Implementaciones concretas de la lógica de negocio.
     └── UsuarioService.java
+    
 🚀 Automatización y Comandos en Ubuntu
 El proyecto utiliza Gradle como gestor de dependencias. Para simplificar el arranque del entorno de pruebas, se utiliza el script bash automatizado run-dev.sh.
 

@@ -1,5 +1,7 @@
 package ni.edu.autotrack_apicore.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,9 +9,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ni.edu.autotrack_apicore.models.base.EntidadBase;
 import ni.edu.autotrack_apicore.models.enums.Estado;
+import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.SoftDeleteType;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "vehiculos", uniqueConstraints = {
@@ -20,6 +26,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SoftDelete(columnName = "eliminado", strategy = SoftDeleteType.ACTIVE)
 public class Vehiculo extends EntidadBase {
     @Column(name = "marca_vehiculo", nullable = false, length = 50)
     private String marca;
@@ -46,7 +53,7 @@ public class Vehiculo extends EntidadBase {
             joinColumns = @JoinColumn(name = "id_vehiculo")
     )
     @Column(name = "url_imagen")
-    private List<String> imagenes;
+    private Set<String> imagenes = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
@@ -54,6 +61,7 @@ public class Vehiculo extends EntidadBase {
             nullable = false,
             foreignKey = @ForeignKey(name = "fk_vehiculo_usuario")
     )
+    @JsonBackReference
     private Usuario usuario;
 
     @OneToMany(
@@ -62,5 +70,15 @@ public class Vehiculo extends EntidadBase {
             orphanRemoval = true,
             fetch = FetchType.LAZY
     )
-    private List<Registro>  registros = new ArrayList<>();
+    @JsonManagedReference
+    private List<Registro> registros = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "vehiculo",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @JsonManagedReference
+    private List<DocumentoVehiculo> documentosVehiculo = new ArrayList<>();
 }

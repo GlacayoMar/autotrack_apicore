@@ -92,9 +92,11 @@ public class VehiculoServiceImpl implements VehiculoService {
     }
 
     @Override
+    @Transactional
     public void eliminar(Long id) {
+        Vehiculo vehiculo = vehiculoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Vehiculo no encontrado"));
 
-        Vehiculo vehiculo = obtenerPorId(id);
-        vehiculo.setActivo(false);
+        vehiculoRepository.delete(vehiculo);
     }
 }

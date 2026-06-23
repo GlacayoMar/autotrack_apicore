@@ -49,7 +49,7 @@ public class DataSeeder implements CommandLineRunner {
 
         // 1. POBLAR USUARIOS
         List<Usuario> usuarios = new ArrayList<>();
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 500; i++) {
             Usuario u = new Usuario();
             u.setNombres(faker.name().firstName());
             u.setApellidos(faker.name().lastName());
@@ -65,6 +65,7 @@ public class DataSeeder implements CommandLineRunner {
         // 2. POBLAR VEHÍCULOS
         List<Vehiculo> vehiculos = new ArrayList<>();
         String[] marcas = {"Toyota", "Hyundai", "Kia", "Suzuki"};
+        //long contador = 300000;  *dejalo por si acaso te da problemas el faker al correr el ambiente de prueba*
 
         for (Usuario usuario : usuarios) {
             int randomCars = faker.number().numberBetween(1, 3);
@@ -73,10 +74,10 @@ public class DataSeeder implements CommandLineRunner {
                 v.setMarca(marcas[faker.number().numberBetween(0, marcas.length)]);
                 v.setModelo(faker.vehicle().model());
                 v.setAnio(faker.number().numberBetween(2015, Year.now().getValue()));
-                v.setPlaca("M " + faker.number().digits(6));
-                v.setVin(faker.vehicle().vin());
+                v.setPlaca("M " + faker.number().digits(6)); //si te genera muchos problemas solo pones ("M " + contador)
+                // Y aqui abajo contador++;
+                v.setVin(faker.vehicle().vin()); // este no me ha dado problemas pero si lo hace pues aplicas lo mismo del contador
 
-                // Usando tu Enum Estado real (Ajusta los valores internos según tus enums reales)
                 v.setEstado(Estado.CHUQUITI);
 
                 v.setUsuario(usuario);
@@ -110,7 +111,12 @@ public class DataSeeder implements CommandLineRunner {
             if (faker.bool().bool()) {
                 RegistroProblema rp = new RegistroProblema();
                 rp.setFechaRegistro(LocalDate.now());
-                rp.setNota("Revision de equipamiento: " + faker.vehicle().standardSpecs()); // Genera descripciones automáticas de piezas o fallos
+                // Para crear notas de prueba
+                String notaFallo = ("Revision de equipamiento: " + faker.vehicle().standardSpecs());
+                if (notaFallo.length() > 500) {
+                    notaFallo = notaFallo.substring(0, 490) + "...";
+                }
+                rp.setNota(notaFallo); //fue un dolor de manguaco hayarle solucion
                 rp.setVehiculo(vehiculo);
 
                 // Datos del detalle del problema
