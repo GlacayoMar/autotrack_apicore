@@ -21,7 +21,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SoftDelete(columnName = "eliminado", strategy = SoftDeleteType.ACTIVE)
+@SoftDelete(columnName = "eliminado", strategy = SoftDeleteType.DELETED)
 public class Documento extends EntidadBase {
     @Column(name = "fecha_vecimiento", nullable = false)
     private LocalDate fechaVencimiento;

@@ -19,7 +19,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SoftDelete(columnName = "eliminado", strategy = SoftDeleteType.ACTIVE)
+@SoftDelete(columnName = "eliminado", strategy = SoftDeleteType.DELETED)
 public abstract class Registro extends EntidadBase {
     @Column(name = "fecha_registro", nullable = false)
     private LocalDate fechaRegistro;

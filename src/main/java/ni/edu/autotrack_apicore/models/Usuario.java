@@ -22,7 +22,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SoftDelete(columnName = "eliminado", strategy = SoftDeleteType.ACTIVE)
+@SoftDelete(columnName = "eliminado", strategy = SoftDeleteType.DELETED)
 public class Usuario extends EntidadBase {
 
     @Column(name = "nombre_usuario", nullable = false, length = 50)
@@ -46,7 +46,11 @@ public class Usuario extends EntidadBase {
     @Column(name = "pais", nullable = false, length = 50)
     private String pais;
 
-    @OneToMany(mappedBy = "usuario")
+    @OneToMany(
+            mappedBy = "usuario",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     @JsonManagedReference
     private List<Vehiculo> vehiculos;
 

@@ -26,7 +26,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SoftDelete(columnName = "eliminado", strategy = SoftDeleteType.ACTIVE)
+@SoftDelete(columnName = "eliminado", strategy = SoftDeleteType.DELETED)
 public class Vehiculo extends EntidadBase {
     @Column(name = "marca_vehiculo", nullable = false, length = 50)
     private String marca;
