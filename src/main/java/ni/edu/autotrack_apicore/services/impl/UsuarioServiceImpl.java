@@ -3,9 +3,11 @@ package ni.edu.autotrack_apicore.services.impl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import ni.edu.autotrack_apicore.models.Usuario;
-import ni.edu.autotrack_apicore.models.Vehiculo;
 import ni.edu.autotrack_apicore.repositories.UsuarioRepository;
+import ni.edu.autotrack_apicore.services.UserDetailsService;
 import ni.edu.autotrack_apicore.services.UsuarioService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,8 +16,10 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class UsuarioServiceImpl implements UsuarioService {
+public class UsuarioServiceImpl implements UsuarioService, UserDetailsService {
     private final UsuarioRepository usuarioRepository;
+
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
     public Usuario crear(Usuario usuario) {
@@ -29,6 +33,8 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new IllegalArgumentException(
                     "El username ya se encuentra registrado");
         }
+        String passwordEncriptada = passwordEncoder.encode(usuario.getPassword());
+        usuario.setPassword(passwordEncriptada);
 
         return usuarioRepository.save(usuario);
     }
@@ -76,5 +82,14 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
 
         usuarioRepository.delete(usuario);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Usuario loadUserByUsername(String username) throws UsernameNotFoundException {
+        // Buscamos en la BD por email (o username). Spring Security llamará a este método.
+        // Como tu clase 'Usuario' ya implementa UserDetails (en el paso anterior), la podemos retornar directamente.
+        return usuarioRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con el email: " + username));
     }
 }

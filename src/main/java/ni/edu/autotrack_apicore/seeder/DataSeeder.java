@@ -9,16 +9,14 @@ import ni.edu.autotrack_apicore.models.enums.TipoProblema;
 import ni.edu.autotrack_apicore.repositories.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Year;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -27,13 +25,15 @@ public class DataSeeder implements CommandLineRunner {
 
     private final UsuarioRepository usuarioRepository;
     private final VehiculoRepository vehiculoRepository;
-    private final RegistroRepository registroRepository; // Inyecta el repo padre para salvar los registros
+    private final RegistroRepository registroRepository;
     private final LicenciaRepository licenciaRepository;
     private final DocumentoVehiculoRepository documentoVehiculoRepository;
     private final MultaRepository multaRepository;
     private final NotificacionRepository notificacionRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     private final Faker faker;
+
 
     public DataSeeder(UsuarioRepository usuarioRepository,
                       VehiculoRepository vehiculoRepository,
@@ -41,7 +41,8 @@ public class DataSeeder implements CommandLineRunner {
                       LicenciaRepository licenciaRepository,
                       DocumentoVehiculoRepository documentoVehiculoRepository,
                       MultaRepository multaRepository,
-                      NotificacionRepository notificacionRepository) {
+                      NotificacionRepository notificacionRepository,
+                      BCryptPasswordEncoder passwordEncoder){
         this.usuarioRepository = usuarioRepository;
         this.vehiculoRepository = vehiculoRepository;
         this.registroRepository = registroRepository;
@@ -49,6 +50,7 @@ public class DataSeeder implements CommandLineRunner {
         this.documentoVehiculoRepository = documentoVehiculoRepository;
         this.multaRepository = multaRepository;
         this.notificacionRepository = notificacionRepository;
+        this.passwordEncoder = passwordEncoder;
         this.faker = new Faker(new Locale("es"));
     }
 
@@ -61,16 +63,18 @@ public class DataSeeder implements CommandLineRunner {
 
         System.out.println("──> [PostgreSQL] Generando ambiente de prueba profesional para Autotrack...");
 
+        String passwordGenericaEncriptada = passwordEncoder.encode("password-123");
+
         // 1. POBLAR USUARIOS
         List<Usuario> usuarios = new ArrayList<>();
-        for (int i = 0; i < 500; i++) {
+        for (int i = 0; i < 150; i++) {
             Usuario u = new Usuario();
             u.setNombres(faker.name().firstName());
             u.setApellidos(faker.name().lastName());
             u.setEmail(i + "_" + faker.internet().emailAddress());
             u.setUsername(faker.name().username() + "_" + i);
             u.setNumeroTel(faker.phoneNumber().cellPhone());
-            u.setPassword("password_raw_provicional");
+            u.setPassword(passwordGenericaEncriptada); //contra encriptada
             u.setPais("Nicaragua");
             usuarios.add(u);
         }
@@ -110,7 +114,7 @@ public class DataSeeder implements CommandLineRunner {
             // Generar un registro de combustible por cada vehículo
             RegistroCombustible rc = new RegistroCombustible();
             // Genera una fecha aleatoria de los últimos 30 días
-            rc.setFechaRegistro(faker.date().past(30, TimeUnit.DAYS).toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate());
+            rc.setFechaRegistro(faker.date().past(30, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
             rc.setNota("Combustible semanal - Gasolinera Puma");
             rc.setVehiculo(vehiculo);
 
@@ -156,7 +160,7 @@ public class DataSeeder implements CommandLineRunner {
         for (Usuario usuario : usuarios) {
             Licencia l = new Licencia();
             // Fecha emitida en los últimos 3 años
-            LocalDate fechaEmitida = faker.date().past(3 * 365, TimeUnit.DAYS).toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+            LocalDate fechaEmitida = faker.date().past(3 * 365, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             l.setFechaEmitida(fechaEmitida);
             // Vence en 5 años
             l.setFechaVencimiento(fechaEmitida.plusYears(5));
@@ -183,7 +187,7 @@ public class DataSeeder implements CommandLineRunner {
             for (int k = 0; k < randomDocs; k++) {
                 DocumentoVehiculo dv = new DocumentoVehiculo();
                 dv.setNombre(nombresDocs[k % nombresDocs.length]);
-                LocalDate fechaEmitida = faker.date().past(365, TimeUnit.DAYS).toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+                LocalDate fechaEmitida = faker.date().past(365, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 dv.setFechaEmitida(fechaEmitida);
                 dv.setFechaVencimiento(fechaEmitida.plusYears(1)); // Vence en un año
                 dv.setImagen("https://picsum.photos/seed/docvehiculo_" + vehiculo.getId() + "_" + k + "/400/300");
@@ -219,7 +223,7 @@ public class DataSeeder implements CommandLineRunner {
                     m.setDescripcion(infracciones[faker.number().numberBetween(0, infracciones.length)]);
                     m.setMonto(montos[faker.number().numberBetween(0, montos.length)]);
 
-                    LocalDate fechaMulta = faker.date().past(180, TimeUnit.DAYS).toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+                    LocalDate fechaMulta = faker.date().past(180, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                     m.setFechaMulta(fechaMulta);
                     m.setFechaLimite(fechaMulta.plusDays(30));
                     m.setFechaEmitida(fechaMulta);

@@ -15,6 +15,19 @@
 
 La clase `DataSeeder` (ubicada en el paquete raíz de escaneo) implementa `CommandLineRunner`. Utiliza la librería **Datafaker** para inyectar información realista (en español) de manera automatizada inmediatamente después de que el contexto de Spring levanta con éxito.
 
+## 🔒 Authentication Flow (JWT)
+
+This API utilizes stateless **JSON Web Tokens (JWT)** for secure authentication, migrating away from standard Basic Authentication. This ensures that user sessions do not occupy memory on the server, making the system highly scalable.
+
+### 🔄 The Authentication Lifecycle
+
+1. **User Login:** The client initiates a `POST` request to `/api/auth/login` containing their raw credentials (`email` and `password`).
+2. **Verification & Hashing:** The `AuthenticationManager` intercepts the request, retrieves the user profile from PostgreSQL, and verifies the password against the stored database record using the secure **BCrypt hashing algorithm**.
+3. **Token Issuance & Metadata:** Upon successful validation, the system generates a digitally signed JWT token and returns it alongside the user's database `id`. This allows front-end applications to store the ID locally for subsequent user-specific profile fetches.
+4. **Subsequent API Requests:** For all subsequent requests to protected endpoints (e.g., managing vehicles, viewing fines, checking notifications), the client must include this token in the HTTP headers:
+   ```http
+   Authorization: Bearer <YOUR_JWT_TOKEN>
+
 ### Restricciones de Unicidad Soportadas:
 El script calcula y altera de forma dinámica campos únicos para evitar excepciones de PostgreSQL (`ConstraintViolationException`):
 * **Usuarios:** `email` y `username` dinámicos por índice. Contraseña genérica temporal (`password_raw_provicional`) antes del proceso de *chunchado* (encriptación hash con BCrypt).
