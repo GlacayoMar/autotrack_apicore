@@ -67,7 +67,7 @@ public class DataSeeder implements CommandLineRunner {
 
         // 1. POBLAR USUARIOS
         List<Usuario> usuarios = new ArrayList<>();
-        for (int i = 0; i < 150; i++) {
+        for (int i = 0; i < 50; i++) {
             Usuario u = new Usuario();
             u.setNombres(faker.name().firstName());
             u.setApellidos(faker.name().lastName());
@@ -82,11 +82,11 @@ public class DataSeeder implements CommandLineRunner {
 
         // 2. POBLAR VEHÍCULOS
         List<Vehiculo> vehiculos = new ArrayList<>();
-        String[] marcas = {"Toyota", "Hyundai", "Kia", "Suzuki"};
+        String[] marcas = {"Toyota", "Hyundai", "Kia", "Suzuki, Honda"};
         //long contador = 300000;  *dejalo por si acaso te da problemas el faker al correr el ambiente de prueba*
 
         for (Usuario usuario : usuarios) {
-            int randomCars = faker.number().numberBetween(1, 3);
+            int randomCars = faker.number().numberBetween(1, 4);
             for (int j = 0; j < randomCars; j++) {
                 Vehiculo v = new Vehiculo();
                 v.setMarca(marcas[faker.number().numberBetween(0, marcas.length)]);
@@ -111,19 +111,22 @@ public class DataSeeder implements CommandLineRunner {
         TipoProblema[] tiposDeProblema = TipoProblema.values();
 
         for (Vehiculo vehiculo : vehiculos) {
+            int randomRegistrosCombustibles = faker.number().numberBetween(5, 10);
             // Generar un registro de combustible por cada vehículo
-            RegistroCombustible rc = new RegistroCombustible();
-            // Genera una fecha aleatoria de los últimos 30 días
-            rc.setFechaRegistro(faker.date().past(30, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-            rc.setNota("Combustible semanal - Gasolinera Puma");
-            rc.setVehiculo(vehiculo);
+            for (int l = 0; l < randomRegistrosCombustibles; l++) {
+                RegistroCombustible rc = new RegistroCombustible();
+                // Genera una fecha aleatoria de los últimos 30 días
+                rc.setFechaRegistro(faker.date().past(30, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+                rc.setNota("Combustible semanal - Gasolinera Puma");
+                rc.setVehiculo(vehiculo);
 
-            // Datos del detalle de combustible
-            rc.setCantidadCombustible(BigDecimal.valueOf(faker.number().randomDouble(2, 5, 15))); // Galones/Litros
-            rc.setCantidadPagado(BigDecimal.valueOf(faker.number().randomDouble(2, 500, 2000))); // Córdobas/Dólares
-            rc.setOdometro((long) faker.number().numberBetween(10000, 150000));
+                // Datos del detalle de combustible
+                rc.setCantidadCombustible(BigDecimal.valueOf(faker.number().randomDouble(2, 5, 15))); // Galones/Litros
+                rc.setCantidadPagado(BigDecimal.valueOf(faker.number().randomDouble(2, 500, 2000))); // Córdobas/Dólares
+                rc.setOdometro((long) faker.number().numberBetween(10000, 150000));
 
-            todosLosRegistros.add(rc);
+                todosLosRegistros.add(rc);
+            }
 
             // Generar un registro de problema de forma aleatoria (50% de probabilidad por vehículo)
             if (faker.bool().bool()) {
