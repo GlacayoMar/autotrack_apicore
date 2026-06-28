@@ -45,7 +45,7 @@ public class Usuario extends EntidadBase implements UserDetails {
     private String username;
 
     @Column(name = "password", nullable = false, length = 250)
-    private String password; // hay que chuncharlo
+    private String password;
 
     @Column(name = "pais", nullable = false, length = 50)
     private String pais;

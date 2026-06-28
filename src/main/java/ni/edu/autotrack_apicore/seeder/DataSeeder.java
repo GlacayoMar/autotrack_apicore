@@ -69,13 +69,33 @@ public class DataSeeder implements CommandLineRunner {
         List<Usuario> usuarios = new ArrayList<>();
         for (int i = 0; i < 50; i++) {
             Usuario u = new Usuario();
-            u.setNombres(faker.name().firstName());
-            u.setApellidos(faker.name().lastName());
-            u.setEmail(i + "_" + faker.internet().emailAddress());
-            u.setUsername(faker.name().username() + "_" + i);
+
+            // 1. Generar y asignar nombre y apellido
+            String primerNombre = faker.name().firstName();
+            String apellido = faker.name().lastName();
+
+            u.setNombres(primerNombre);
+            u.setApellidos(apellido);
+
+            // 2. Limpiar los strings para usarlos en email y username (minúsculas y sin espacios)
+            String nombreLimpio = primerNombre.toLowerCase().replaceAll("\\s+", "");
+            String apellidoLimpio = apellido.toLowerCase().replaceAll("\\s+", "");
+
+            // 3. Generar Email (ej: juanperez@gmail.com)
+            // Agregamos el índice "i" al inicio o final solo por si Faker repite combinaciones de nombres
+            String email = nombreLimpio + apellidoLimpio + i + "@gmail.com";
+            u.setEmail(email);
+
+            // 4. Generar Username (ej: jperez)
+            String primerLetra = nombreLimpio.isEmpty() ? "" : nombreLimpio.substring(0, 1);
+            String username = primerLetra + apellidoLimpio + "_" + i;
+            u.setUsername(username);
+
+            // El resto de los datos se mantiene igual
             u.setNumeroTel(faker.phoneNumber().cellPhone());
             u.setPassword(passwordGenericaEncriptada); //contra encriptada
             u.setPais("Nicaragua");
+
             usuarios.add(u);
         }
         usuarioRepository.saveAll(usuarios);
@@ -111,19 +131,39 @@ public class DataSeeder implements CommandLineRunner {
         TipoProblema[] tiposDeProblema = TipoProblema.values();
 
         for (Vehiculo vehiculo : vehiculos) {
-            int randomRegistrosCombustibles = faker.number().numberBetween(5, 10);
-            // Generar un registro de combustible por cada vehículo
+            int randomRegistrosCombustibles = faker.number().numberBetween(8, 16);
+
+            // 1. Generar una lista de fechas ordenadas cronológicamente para este vehículo
+            List<LocalDate> fechasOrdenadas = new ArrayList<>();
+            for (int i = 0; i < randomRegistrosCombustibles; i++) {
+                fechasOrdenadas.add(faker.date().past(90, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+            }
+            Collections.sort(fechasOrdenadas);
+
+            // 2. Definir un odómetro inicial aleatorio para el carro y el precio por litro en Nic (C$ 47.81 aprox)
+            long odometroActual = (long) faker.number().numberBetween(10000, 100000);
+            double precioPorUnidad = 47.81; // Basado en el precio congelado en Nicaragua por litro (Regular)
+
+            // Generar un registro de combustible por cada vehículo usando las fechas ordenadas
             for (int l = 0; l < randomRegistrosCombustibles; l++) {
                 RegistroCombustible rc = new RegistroCombustible();
-                // Genera una fecha aleatoria de los últimos 30 días
-                rc.setFechaRegistro(faker.date().past(30, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+
+                // Asignar fecha en orden ascendente
+                rc.setFechaRegistro(fechasOrdenadas.get(l));
                 rc.setNota("Combustible semanal - Gasolinera Puma");
                 rc.setVehiculo(vehiculo);
 
                 // Datos del detalle de combustible
-                rc.setCantidadCombustible(BigDecimal.valueOf(faker.number().randomDouble(2, 5, 15))); // Galones/Litros
-                rc.setCantidadPagado(BigDecimal.valueOf(faker.number().randomDouble(2, 500, 2000))); // Córdobas/Dólares
-                rc.setOdometro((long) faker.number().numberBetween(10000, 150000));
+                double litrosOgalones = faker.number().randomDouble(2, 20, 50); // Ajustado a un tanque normal (20-50 Litros)
+                rc.setCantidadCombustible(BigDecimal.valueOf(litrosOgalones));
+
+                // Calcular pago real basado en los litros y el precio de Nicaragua
+                double totalPagado = litrosOgalones * precioPorUnidad;
+                rc.setCantidadPagado(BigDecimal.valueOf(totalPagado));
+
+                // El odómetro crece de forma realista entre 300 y 700 km/millas por cada tanqueada
+                odometroActual += faker.number().numberBetween(300, 700);
+                rc.setOdometro(odometroActual);
 
                 todosLosRegistros.add(rc);
             }
