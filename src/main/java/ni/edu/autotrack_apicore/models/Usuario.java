@@ -69,9 +69,8 @@ public class Usuario extends EntidadBase implements UserDetails {
 
     @OneToOne(
             mappedBy = "usuario",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.EAGER
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, // Evita que ALL fuerce búsquedas automáticas
+            fetch = FetchType.LAZY
     )
     @JsonManagedReference
     private Licencia licencia;
@@ -87,14 +86,11 @@ public class Usuario extends EntidadBase implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Si no manejas roles (ADMIN, USER), devolvemos una lista con un rol por defecto.
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override
     public String getUsername() {
-        // ATENCIÓN: Si vas a usar el EMAIL para iniciar sesión, retorna "this.email".
-        // Si vas a usar el USERNAME para iniciar sesión, retorna "this.username".
         return this.email;
     }
 

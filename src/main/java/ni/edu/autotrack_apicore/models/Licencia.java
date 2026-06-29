@@ -34,7 +34,7 @@ public class Licencia extends Documento {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "id_usuario",
-            nullable = false,
+            nullable = true,
             foreignKey = @ForeignKey(name = "fk_licencia_usuario")
     )
     @JsonBackReference
