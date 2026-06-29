@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -56,6 +57,12 @@ public class UsuarioServiceImpl implements UsuarioService, UserDetailsService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<Usuario> listarActualizadosDespuseDe(LocalDateTime fecha) {
+        return usuarioRepository.findUpdatedAfterRaw(fecha);
+    }
+
+    @Override
     public Usuario actualizar(Long id, Usuario usuarioActualizado) {
 
         Usuario usuario = obtenerPorId(id);
@@ -71,6 +78,8 @@ public class UsuarioServiceImpl implements UsuarioService, UserDetailsService {
         usuario.setNumeroTel(usuarioActualizado.getNumeroTel());
         usuario.setPais(usuarioActualizado.getPais());
         usuario.setUsername(usuarioActualizado.getUsername());
+        String passwordEncriptada = passwordEncoder.encode(usuario.getPassword());
+        usuario.setPassword(passwordEncriptada);
 
         return usuarioRepository.save(usuario);
     }
@@ -80,6 +89,10 @@ public class UsuarioServiceImpl implements UsuarioService, UserDetailsService {
     public void eliminar(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+
+        usuario.setFechaActualizacion(java.time.LocalDateTime.now());
+
+        usuarioRepository.saveAndFlush(usuario);
 
         usuarioRepository.delete(usuario);
     }
