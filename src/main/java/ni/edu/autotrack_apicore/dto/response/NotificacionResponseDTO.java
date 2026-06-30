@@ -18,4 +18,6 @@ public class NotificacionResponseDTO {
     private String mensaje;
     private Boolean enviada;
     private TipoNotificacion tipo;
+    private Long documentoId;
+    private Long usuarioId;
 }

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import ni.edu.autotrack_apicore.models.Documento;
 import ni.edu.autotrack_apicore.models.Notificacion;
 import ni.edu.autotrack_apicore.models.Usuario;
+import ni.edu.autotrack_apicore.models.Vehiculo;
 import ni.edu.autotrack_apicore.repositories.NotificacionRepository;
 import ni.edu.autotrack_apicore.services.DocumentoService;
 import ni.edu.autotrack_apicore.services.NotificacionService;
@@ -12,6 +13,7 @@ import ni.edu.autotrack_apicore.services.UsuarioService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -64,6 +66,12 @@ public class NotificacionServiceImpl implements NotificacionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<Notificacion> listarActualizadosDespuesDe(LocalDateTime fecha) {
+        return notificacionRepository.findUpdatedAfter(fecha);
+    }
+
+    @Override
     public Notificacion actualizar(Long id, Notificacion notificacionActualizada) {
         Notificacion notificacion = obtenerPorId(id);
         notificacion.setFechaInicio(notificacionActualizada.getFechaInicio());
@@ -83,6 +91,11 @@ public class NotificacionServiceImpl implements NotificacionService {
     @Override
     public void eliminar(Long id) {
         Notificacion notificacion = obtenerPorId(id);
+
+        notificacion.setFechaActualizacion(java.time.LocalDateTime.now());
+
+        notificacionRepository.saveAndFlush(notificacion);
+
         notificacionRepository.delete(notificacion);
     }
 
