@@ -11,5 +11,5 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public class LicenciaResponseDTO extends DocumentoResponseDTO {
     private Set<CategoriaLicencia> categorias;
-    private Usuario usuario;
+    private Long usuarioId;
 }
