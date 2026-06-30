@@ -10,7 +10,6 @@ import java.time.LocalDate;
 
 @Data
 public class MultaRequestDTO {
-    private String nombre;
     private LocalDate fechaVencimiento;
     private LocalDate fechaEmitida;
     private String descripcion;
@@ -18,4 +17,6 @@ public class MultaRequestDTO {
     private LocalDate fechaMulta;
     private LocalDate fechaLimite;
     private Boolean pagada;
+    private String imagen;
+    private Long usuarioId;
 }

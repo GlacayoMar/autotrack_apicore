@@ -18,4 +18,5 @@ public class MultaResponseDTO extends DocumentoResponseDTO {
     private LocalDate fechaLimite;
     private Boolean pagada;
     private Long usuarioId;
+    private String imagen;
 }
