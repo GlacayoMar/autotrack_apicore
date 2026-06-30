@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -42,10 +43,20 @@ public class RegistroServiceImpl implements RegistroService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<Registro> listarActualizadosDespuesDe(LocalDateTime fecha) {
+        return registroRepository.findUpdatedAfter(fecha);
+    }
+
+    @Override
     @Transactional
     public void eliminar(Long id) {
         Registro registro = registroRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("No se puede eliminar. Registro no encontrado."));
+
+        registro.setFechaActualizacion(java.time.LocalDateTime.now());
+
+        registroRepository.saveAndFlush(registro);
 
         registroRepository.delete(registro);
     }

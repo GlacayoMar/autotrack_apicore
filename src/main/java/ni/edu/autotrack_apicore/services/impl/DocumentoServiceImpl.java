@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -32,6 +33,12 @@ public class DocumentoServiceImpl implements DocumentoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<Documento> listarActualizadosDespuesDe(LocalDateTime fecha) {
+        return documentoRepository.findUpdatedAfter(fecha);
+    }
+
+    @Override
     public Documento actualizar(Long id, Documento documentoActualizado) {
         Documento documento = obtenerPorId(id);
         documento.setFechaVencimiento(documentoActualizado.getFechaVencimiento());
@@ -43,6 +50,11 @@ public class DocumentoServiceImpl implements DocumentoService {
     @Override
     public void eliminar(Long id) {
         Documento documento = obtenerPorId(id);
+
+        documento.setFechaActualizacion(java.time.LocalDateTime.now());
+
+        documentoRepository.saveAndFlush(documento);
+
         documentoRepository.delete(documento);
     }
 

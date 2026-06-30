@@ -3,7 +3,6 @@ package ni.edu.autotrack_apicore.services.impl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import ni.edu.autotrack_apicore.models.Multa;
-import ni.edu.autotrack_apicore.models.Usuario;
 import ni.edu.autotrack_apicore.repositories.MultaRepository;
 import ni.edu.autotrack_apicore.services.MultaService;
 import ni.edu.autotrack_apicore.services.UsuarioService;
@@ -21,9 +20,7 @@ public class MultaServiceImpl implements MultaService {
     private final UsuarioService usuarioService;
 
     @Override
-    public Multa crear(Long usuarioId, Multa multa) {
-        Usuario usuario = usuarioService.obtenerPorId(usuarioId);
-        multa.setUsuario(usuario);
+    public Multa crear(Multa multa) {
         if (multa.getPagada() == null) {
             multa.setPagada(false);
         }
@@ -56,6 +53,12 @@ public class MultaServiceImpl implements MultaService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<Multa> listarActualizadosDespuesDe(java.time.LocalDateTime fecha) {
+        return multaRepository.findUpdatedAfter(fecha);
+    }
+
+    @Override
     public Multa actualizar(Long id, Multa multaActualizada) {
         Multa multa = obtenerPorId(id);
         multa.setFechaVencimiento(multaActualizada.getFechaVencimiento());
@@ -74,6 +77,11 @@ public class MultaServiceImpl implements MultaService {
     @Override
     public void eliminar(Long id) {
         Multa multa = obtenerPorId(id);
+
+        multa.setFechaActualizacion(java.time.LocalDateTime.now());
+
+        multaRepository.saveAndFlush(multa);
+
         multaRepository.delete(multa);
     }
 

@@ -10,6 +10,7 @@ import ni.edu.autotrack_apicore.services.VehiculoService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -35,6 +36,12 @@ public class RegsitroProblemaServiceImpl implements RegistroProblemaService {
             return problemaRepository.findByVehiculoIdAndActivoTrue(vehiculoId);
         }
         return problemaRepository.findByVehiculoIdOrderByFechaRegistroDesc(vehiculoId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RegistroProblema> listarActualizadoDespuesDe(LocalDateTime fecha) {
+        return problemaRepository.findUpdatedAfterRaw(fecha);
     }
 
     @Override
