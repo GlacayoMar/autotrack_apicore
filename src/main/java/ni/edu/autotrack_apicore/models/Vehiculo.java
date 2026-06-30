@@ -81,4 +81,13 @@ public class Vehiculo extends EntidadBase {
     )
     @JsonManagedReference
     private List<DocumentoVehiculo> documentosVehiculo = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "vehiculo",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @JsonManagedReference
+    private List<ServicioMantenimiento> serviciosMantenimiento = new ArrayList<>();
 }

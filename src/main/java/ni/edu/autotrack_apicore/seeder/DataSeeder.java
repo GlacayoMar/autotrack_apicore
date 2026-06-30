@@ -2,10 +2,7 @@ package ni.edu.autotrack_apicore.seeder;
 
 import net.datafaker.Faker;
 import ni.edu.autotrack_apicore.models.*;
-import ni.edu.autotrack_apicore.models.enums.CategoriaLicencia;
-import ni.edu.autotrack_apicore.models.enums.Estado;
-import ni.edu.autotrack_apicore.models.enums.TipoNotificacion;
-import ni.edu.autotrack_apicore.models.enums.TipoProblema;
+import ni.edu.autotrack_apicore.models.enums.*;
 import ni.edu.autotrack_apicore.repositories.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
@@ -14,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.ZoneId;
 import java.util.*;
@@ -30,6 +28,7 @@ public class DataSeeder implements CommandLineRunner {
     private final DocumentoVehiculoRepository documentoVehiculoRepository;
     private final MultaRepository multaRepository;
     private final NotificacionRepository notificacionRepository;
+    private final ServicioMantenimientoRepository servicioMantenimientoRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
     private final Faker faker;
@@ -42,6 +41,7 @@ public class DataSeeder implements CommandLineRunner {
                       DocumentoVehiculoRepository documentoVehiculoRepository,
                       MultaRepository multaRepository,
                       NotificacionRepository notificacionRepository,
+                      ServicioMantenimientoRepository servicioMantenimientoRepository,
                       BCryptPasswordEncoder passwordEncoder){
         this.usuarioRepository = usuarioRepository;
         this.vehiculoRepository = vehiculoRepository;
@@ -50,6 +50,7 @@ public class DataSeeder implements CommandLineRunner {
         this.documentoVehiculoRepository = documentoVehiculoRepository;
         this.multaRepository = multaRepository;
         this.notificacionRepository = notificacionRepository;
+        this.servicioMantenimientoRepository = servicioMantenimientoRepository;
         this.passwordEncoder = passwordEncoder;
         this.faker = new Faker(new Locale("es"));
     }
@@ -65,7 +66,9 @@ public class DataSeeder implements CommandLineRunner {
 
         String passwordGenericaEncriptada = passwordEncoder.encode("password-123");
 
+        // ==========================================
         // 1. POBLAR USUARIOS
+        // ==========================================
         List<Usuario> usuarios = new ArrayList<>();
         for (int i = 0; i < 50; i++) {
             Usuario u = new Usuario();
@@ -100,7 +103,9 @@ public class DataSeeder implements CommandLineRunner {
         }
         usuarioRepository.saveAll(usuarios);
 
+        // ==========================================
         // 2. POBLAR VEHÍCULOS
+        // ==========================================
         List<Vehiculo> vehiculos = new ArrayList<>();
         String[] marcas = {"Toyota", "Hyundai", "Kia", "Suzuki, Honda"};
         //long contador = 300000;  *dejalo por si acaso te da problemas el faker al correr el ambiente de prueba*
@@ -124,7 +129,9 @@ public class DataSeeder implements CommandLineRunner {
         }
         vehiculoRepository.saveAll(vehiculos);
 
+        // ==========================================
         // 3. POBLAR REGISTROS (HERENCIA JOINED)
+        // ==========================================
         List<Registro> todosLosRegistros = new ArrayList<>();
 
         // Obtenemos los Enums de TipoProblema que creaste
@@ -197,7 +204,9 @@ public class DataSeeder implements CommandLineRunner {
         // los datos a las tablas hijas correspondientes en Postgres gracias a @Inheritance
         registroRepository.saveAll(todosLosRegistros);
 
+        // ==========================================
         // 4. POBLAR LICENCIAS (OneToOne con Usuario)
+        // ==========================================
         List<Licencia> licencias = new ArrayList<>();
         CategoriaLicencia[] categorias = CategoriaLicencia.values();
         for (Usuario usuario : usuarios) {
@@ -221,7 +230,9 @@ public class DataSeeder implements CommandLineRunner {
         }
         licenciaRepository.saveAll(licencias);
 
+        // =============================================================
         // 5. POBLAR DOCUMENTOS DE VEHÍCULOS (ManyToOne con Vehículo)
+        // =============================================================
         List<DocumentoVehiculo> documentosVehiculos = new ArrayList<>();
         String[] nombresDocs = {"Seguro Obligatorio", "Matrícula de Circulación", "Inspección de Gases", "Inspección Mecánica"};
         for (Vehiculo vehiculo : vehiculos) {
@@ -240,7 +251,9 @@ public class DataSeeder implements CommandLineRunner {
         }
         documentoVehiculoRepository.saveAll(documentosVehiculos);
 
+        // ==========================================
         // 6. POBLAR MULTAS (ManyToOne con Usuario)
+        // ==========================================
         List<Multa> multas = new ArrayList<>();
         String[] infracciones = {
             "Girar en U en zona prohibida",
@@ -280,7 +293,9 @@ public class DataSeeder implements CommandLineRunner {
         }
         multaRepository.saveAll(multas);
 
+        // ================================================================
         // 7. POBLAR NOTIFICACIONES (Relacionadas a Documentos y Usuarios)
+        // ================================================================
         List<Notificacion> notificaciones = new ArrayList<>();
         List<Documento> todosLosDocumentos = new ArrayList<>();
 
@@ -331,9 +346,55 @@ public class DataSeeder implements CommandLineRunner {
         }
         notificacionRepository.saveAll(notificaciones);
 
+        // ==========================================
+        // 8. POBLAR SERVICIOS DE MANTENIMIENTO
+        // ==========================================
+        List<ServicioMantenimiento> mantenimientos = new ArrayList<>();
+        TipoMantenimiento[] tiposMantenimiento = TipoMantenimiento.values();
+
+        for (Vehiculo vehiculo : vehiculos) {
+            // Generamos entre 1 y 3 servicios de mantenimiento aleatorios para cada carro en la base de datos
+            int cantidadMantenimientos = faker.number().numberBetween(1, 4);
+
+            for (int k = 0; k < cantidadMantenimientos; k++) {
+                ServicioMantenimiento sm = new ServicioMantenimiento();
+
+                // Seleccionamos un tipo de mantenimiento aleatorio de tu Enum
+                TipoMantenimiento tipoAleatorio = tiposMantenimiento[faker.number().numberBetween(0, tiposMantenimiento.length)];
+                sm.setTipo(tipoAleatorio);
+
+                // Generamos títulos y descripciones coherentes usando Faker
+                sm.setTitulo(faker.options().option("Mantenimiento de " + tipoAleatorio.name().toLowerCase().replace("_", " "), "Revisión técnica de " + vehiculo.getMarca()));
+                sm.setDescripcion(faker.lorem().sentence(12));
+                sm.setObservaciones(faker.lorem().sentence(6));
+
+                // Lógica de negocio e indicadores de control vehicular
+                sm.setAfectaVehiculo(faker.bool().bool());
+                sm.setCompletado(faker.bool().bool()); // Algunos nacerán hechos y otros pendientes
+                sm.setDistanciaAgendada(faker.number().numberBetween(5000, 100000));
+
+                // Lógica de Fechas: Generamos fechas futuras coherentes para evitar la restricción de tu capa de servicio
+                // (Entre hoy y los próximos 6 meses)
+                int diasEnElFuturo = faker.number().numberBetween(1, 180);
+                sm.setFechaAgendada(LocalDateTime.now().plusDays(diasEnElFuturo).withNano(0));
+
+                // Campos de auditoría heredados de EntidadBase
+                sm.setFechaCreacion(LocalDateTime.now());
+                sm.setFechaActualizacion(LocalDateTime.now());
+                sm.setActivo(true);
+
+                // Amarramos el mantenimiento a su respectivo vehículo
+                sm.setVehiculo(vehiculo);
+                mantenimientos.add(sm);
+            }
+        }
+
+        servicioMantenimientoRepository.saveAll(mantenimientos);
+
         System.out.println("──> [PostgreSQL] ¡Seeder finalizado con éxito!");
         System.out.println("    Usuarios creados: " + usuarios.size());
         System.out.println("    Vehículos creados: " + vehiculos.size());
+        System.out.println("    Servicios de mantenimiento creados: " + mantenimientos.size());
         System.out.println("    Licencias creadas: " + licencias.size());
         System.out.println("    Documentos de vehículos creados: " + documentosVehiculos.size());
         System.out.println("    Multas de tránsito creadas: " + multas.size());

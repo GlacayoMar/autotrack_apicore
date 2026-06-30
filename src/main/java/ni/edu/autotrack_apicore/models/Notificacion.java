@@ -61,4 +61,9 @@ public class Notificacion extends EntidadBase {
     )
     @JsonBackReference
     private Usuario usuario;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_servicio_mantenimiento")
+    @JsonBackReference
+    private ServicioMantenimiento servicioMantenimiento;
 }
