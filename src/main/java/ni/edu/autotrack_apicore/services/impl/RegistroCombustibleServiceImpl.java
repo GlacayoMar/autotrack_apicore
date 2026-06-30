@@ -57,7 +57,6 @@ public class RegistroCombustibleServiceImpl implements RegistroCombustibleServic
         RegistroCombustible registro = obtenerPorId(id);
         registro.setFechaRegistro(registroActualizado.getFechaRegistro());
         registro.setNota(registroActualizado.getNota());
-        registro.setVehiculo(registroActualizado.getVehiculo());
         registro.setFechaRegistro(registroActualizado.getFechaRegistro());
         registro.setOdometro(registroActualizado.getOdometro());
         registro.setCantidadCombustible(registroActualizado.getCantidadCombustible());

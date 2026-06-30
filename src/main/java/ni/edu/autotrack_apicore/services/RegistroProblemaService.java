@@ -14,6 +14,8 @@ public interface RegistroProblemaService {
 
     RegistroProblema obtenerPorId(Long id);
 
+    RegistroProblema actualizar(Long id, RegistroProblema problema);
+
     // Método para marcar un problema como "Solucionado" (activo = false)
     void solucionarProblema(Long id);
 

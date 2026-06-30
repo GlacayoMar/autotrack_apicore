@@ -19,14 +19,15 @@ La clase `DataSeeder` (ubicada en el paquete raíz de escaneo) implementa `Comma
 
 This API utilizes stateless **JSON Web Tokens (JWT)** for secure authentication, migrating away from standard Basic Authentication. This ensures that user sessions do not occupy memory on the server, making the system highly scalable.
 
-### 🔄 The Authentication Lifecycle
+### 🔄 Ciclo de Vida de la Autenticacion
 
-1. **User Login:** The client initiates a `POST` request to `/api/auth/login` containing their raw credentials (`email` and `password`).
-2. **Verification & Hashing:** The `AuthenticationManager` intercepts the request, retrieves the user profile from PostgreSQL, and verifies the password against the stored database record using the secure **BCrypt hashing algorithm**.
-3. **Token Issuance & Metadata:** Upon successful validation, the system generates a digitally signed JWT token and returns it alongside the user's database `id`. This allows front-end applications to store the ID locally for subsequent user-specific profile fetches.
-4. **Subsequent API Requests:** For all subsequent requests to protected endpoints (e.g., managing vehicles, viewing fines, checking notifications), the client must include this token in the HTTP headers:
+1. **Inicio de sesión de usuario:** El cliente inicia una solicitud `POST` a `/api/auth/login` que incluye sus credenciales sin procesar (`email` y `password`).
+2. **Verificación y hash:** El `AuthenticationManager` intercepta la solicitud, recupera el perfil del usuario desde PostgreSQL y verifica la contraseña frente al registro almacenado en la base de datos utilizando el algoritmo de hashing seguro **BCrypt**.
+3. **Emisión de tokens y metadatos:** Tras una validación exitosa, el sistema genera un token JWT firmado digitalmente y lo devuelve junto con el `id` de la base de datos del usuario. Esto permite que las aplicaciones front-end almacenen el ID localmente para obtener perfiles específicos del usuario en solicitudes posteriores.
+4. **Solicitudes API posteriores:** Para todas las solicitudes posteriores a endpoints protegidos (por ejemplo, gestionar vehículos, ver multas, consultar notificaciones), el cliente debe incluir este token en los encabezados HTTP:
    ```http
-   Authorization: Bearer <YOUR_JWT_TOKEN>
+   Authorization: Bearer <TU_JWT_TOKEN>
+   ```
 
 ### Restricciones de Unicidad Soportadas:
 El script calcula y altera de forma dinámica campos únicos para evitar excepciones de PostgreSQL (`ConstraintViolationException`):

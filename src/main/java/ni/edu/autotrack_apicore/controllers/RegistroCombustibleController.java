@@ -5,7 +5,6 @@ import ni.edu.autotrack_apicore.dto.request.RegistroCombustibleRequestDTO;
 import ni.edu.autotrack_apicore.dto.response.RegistroCombustibleResponseDTO;
 import ni.edu.autotrack_apicore.dto.sync.RegistroCombustibleSyncDTO;
 import ni.edu.autotrack_apicore.models.RegistroCombustible;
-import ni.edu.autotrack_apicore.models.Vehiculo;
 import ni.edu.autotrack_apicore.services.DocumentoVehiculoService;
 import ni.edu.autotrack_apicore.services.RegistroCombustibleService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -79,12 +78,6 @@ public class RegistroCombustibleController {
         RegistroCombustible regCombustible = convertToEntity(dto);
         RegistroCombustible actualizado = combustibleService.actualizar(id, regCombustible);
         return ResponseEntity.ok(convertToDTO(actualizado));
-    }
-
-    @DeleteMapping("/{vehiculoId}")
-    public ResponseEntity<Void> eliminarPorVehiculo(@PathVariable Long vehiculoId) {
-        documentoVehiculoService.eliminar(vehiculoId);
-        return ResponseEntity.noContent().build();
     }
 
     private RegistroCombustibleSyncDTO convertToSincronizacionDTO(RegistroCombustible entity) {

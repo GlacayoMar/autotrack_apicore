@@ -2,15 +2,9 @@ package ni.edu.autotrack_apicore.controllers;
 
 import lombok.RequiredArgsConstructor;
 import ni.edu.autotrack_apicore.dto.request.RegistroProblemaRequestDTO;
-import ni.edu.autotrack_apicore.dto.request.VehiculoRequestDTO;
-import ni.edu.autotrack_apicore.dto.response.RegistroCombustibleResponseDTO;
 import ni.edu.autotrack_apicore.dto.response.RegistroProblemaResponseDTO;
-import ni.edu.autotrack_apicore.dto.sync.RegistroCombustibleSyncDTO;
 import ni.edu.autotrack_apicore.dto.sync.RegistroProblemaSyncDTO;
-import ni.edu.autotrack_apicore.models.RegistroCombustible;
 import ni.edu.autotrack_apicore.models.RegistroProblema;
-import ni.edu.autotrack_apicore.models.Usuario;
-import ni.edu.autotrack_apicore.models.Vehiculo;
 import ni.edu.autotrack_apicore.services.RegistroProblemaService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -63,8 +57,17 @@ public class RegistroProblemaController {
         return ResponseEntity.ok(dtos);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<RegistroProblemaResponseDTO> actualizar(
+            @PathVariable Long id,
+            @RequestBody RegistroProblemaRequestDTO dto) {
+        RegistroProblema rp = convertToEntity(dto);
+        RegistroProblema actualizado = problemaService.actualizar(id, rp);
+        return ResponseEntity.ok(convertToDTO(actualizado));
+    }
+
     // Marcar un problema mecánico/eléctrico como solucionado
-    @PutMapping("/{id}/solucionar")
+    @PatchMapping("/{id}/solucionar")
     public ResponseEntity<Void> solucionar(@PathVariable Long id) {
         problemaService.solucionarProblema(id);
         return ResponseEntity.noContent().build(); // Devuelve 204 No Content (operación exitosa sin cuerpo)
