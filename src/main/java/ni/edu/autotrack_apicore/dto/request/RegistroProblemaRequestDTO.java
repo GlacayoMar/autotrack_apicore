@@ -10,7 +10,6 @@ import java.time.LocalDate;
 public class RegistroProblemaRequestDTO {
     private Boolean afectaVehiculo;
     private TipoProblema tipoProblema;
-    private Long odometro;
     private String nota;
     private LocalDate fechaRegistro;
 }
