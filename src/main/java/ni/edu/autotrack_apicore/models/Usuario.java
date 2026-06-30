@@ -1,6 +1,7 @@
 package ni.edu.autotrack_apicore.models;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -69,7 +70,8 @@ public class Usuario extends EntidadBase implements UserDetails {
 
     @OneToOne(
             mappedBy = "usuario",
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, // Evita que ALL fuerce búsquedas automáticas
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, // Evita que ALL fuerce búsquedas automáticas
+            orphanRemoval = true,
             fetch = FetchType.LAZY
     )
     @JsonManagedReference
@@ -87,6 +89,11 @@ public class Usuario extends EntidadBase implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    @JsonProperty("username")
+    public String getRealUsername() {
+        return this.username;
     }
 
     @Override

@@ -114,7 +114,7 @@ public class UsuarioController{
         dto.setApellidos(entity.getApellidos());
         dto.setEmail(entity.getEmail());
         dto.setNumeroTel(entity.getNumeroTel());
-        dto.setUsername(entity.getUsername());
+        dto.setUsername(entity.getRealUsername());
         dto.setPais(entity.getPais());
 
         return dto;
