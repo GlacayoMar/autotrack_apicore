@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -43,6 +44,23 @@ public class RegistroCombustibleServiceImpl implements RegistroCombustibleServic
     @Override
     public BigDecimal obtenerTotalGastado(Long vehiculoId) {
         return combustibleRepository.totalGastadoPorVehiculo(vehiculoId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RegistroCombustible> listarActualizadoDespuesDe(LocalDateTime fecha) {
+        return combustibleRepository.findUpdatedAfterRaw(fecha);
+    }
+
+    @Override
+    public RegistroCombustible actualizar(Long id, RegistroCombustible registroActualizado) {
+        RegistroCombustible registro = obtenerPorId(id);
+        registro.setFechaRegistro(registroActualizado.getFechaRegistro());
+        registro.setNota(registroActualizado.getNota());
+        registro.setFechaRegistro(registroActualizado.getFechaRegistro());
+        registro.setOdometro(registroActualizado.getOdometro());
+        registro.setCantidadCombustible(registroActualizado.getCantidadCombustible());
+        return combustibleRepository.save(registro);
     }
 
     @Override

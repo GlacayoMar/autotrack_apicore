@@ -1,12 +1,21 @@
 package ni.edu.autotrack_apicore.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ni.edu.autotrack_apicore.models.base.EntidadBase;
+import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.SoftDeleteType;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -18,7 +27,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Usuario extends EntidadBase {
+@SoftDelete(columnName = "eliminado", strategy = SoftDeleteType.DELETED)
+public class Usuario extends EntidadBase implements UserDetails {
 
     @Column(name = "nombre_usuario", nullable = false, length = 50)
     private String nombres;
@@ -36,12 +46,79 @@ public class Usuario extends EntidadBase {
     private String username;
 
     @Column(name = "password", nullable = false, length = 250)
-    private String password; // hay que chuncharlo
+    private String password;
 
     @Column(name = "pais", nullable = false, length = 50)
     private String pais;
 
-    @OneToMany(mappedBy = "usuario")
+    @OneToMany(
+            mappedBy = "usuario",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonManagedReference
     private List<Vehiculo> vehiculos;
+
+    @OneToMany(
+            mappedBy = "usuario",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @JsonManagedReference
+    private List<Multa> multas = new ArrayList<>();
+
+    @OneToOne(
+            mappedBy = "usuario",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, // Evita que ALL fuerce búsquedas automáticas
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @JsonManagedReference
+    private Licencia licencia;
+
+    @OneToMany(
+            mappedBy = "usuario",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @JsonManagedReference
+    private List<Notificacion> notificaciones = new ArrayList<>();
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    @JsonProperty("username")
+    public String getRealUsername() {
+        return this.username;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // Cuenta activa
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true; // Cuenta no bloqueada
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // Credenciales vigentes
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true; // Usuario habilitado
+    }
 }
 

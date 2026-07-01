@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -15,6 +16,12 @@ public interface RegistroCombustibleRepository extends JpaRepository<RegistroCom
 
     @Query("SELECT COALESCE(SUM(rc.cantidadPagado), 0) FROM RegistroCombustible rc WHERE rc.vehiculo.id = :vehiculoId")
     BigDecimal totalGastadoPorVehiculo(@Param("vehiculoId") Long vehiculoId);
+
+    @Query(value = "SELECT rc.*, r.* " +
+            "FROM registros_combustible rc " +
+            "INNER JOIN registros r ON rc.id = r.id " +
+            "WHERE r.fecha_actualizacion > :fecha", nativeQuery = true)
+    List<RegistroCombustible> findUpdatedAfterRaw(@Param("fecha") LocalDateTime fecha);
 
     @Query("SELECT COALESCE(SUM(rc.cantidadCombustible), 0) FROM RegistroCombustible rc WHERE rc.vehiculo.id = :vehiculoId")
     BigDecimal totalCombustibleConsumidoPorVehiculo(@Param("vehiculoId") Long vehiculoId);

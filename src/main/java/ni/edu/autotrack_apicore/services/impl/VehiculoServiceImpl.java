@@ -9,6 +9,7 @@ import ni.edu.autotrack_apicore.services.VehiculoService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -19,11 +20,9 @@ public class VehiculoServiceImpl implements VehiculoService {
 
     @Override
     public Vehiculo crear(Vehiculo vehiculo) {
-
         if (vehiculoRepository.existsByPlaca(vehiculo.getPlaca())) {
             throw new IllegalArgumentException("Placa ya existe");
         }
-
         if (vehiculoRepository.existsByVin(vehiculo.getVin())) {
             throw new IllegalArgumentException("Vin ya existe");
         }
@@ -42,16 +41,15 @@ public class VehiculoServiceImpl implements VehiculoService {
 
     @Override
     public Vehiculo actualizar(Long id, Vehiculo vehiculoActualizado) {
-
         Vehiculo vehiculo = obtenerPorId(id);
 
-        if (!vehiculo.getPlaca().equals(vehiculoActualizado.getPlaca())
+        if (!vehiculo.getPlaca().equalsIgnoreCase(vehiculoActualizado.getPlaca())
                 && vehiculoRepository.existsByPlaca(vehiculoActualizado.getPlaca())) {
             throw new IllegalArgumentException("Placa ya existente en otro vehiculo registrado");
         }
 
-        if (!vehiculo.getVin().equals(vehiculoActualizado.getVin())
-                && vehiculoRepository.existsByVin(vehiculo.getVin())) {
+        if (!vehiculo.getVin().equalsIgnoreCase(vehiculoActualizado.getVin())
+                && vehiculoRepository.existsByVin(vehiculoActualizado.getVin())) {
             throw new IllegalArgumentException("Numero de VIN/Chasis ya existe en otro vehiculo registrado");
         }
 
@@ -59,6 +57,8 @@ public class VehiculoServiceImpl implements VehiculoService {
         vehiculo.setVin(vehiculoActualizado.getVin());
         vehiculo.setMarca(vehiculoActualizado.getMarca());
         vehiculo.setModelo(vehiculoActualizado.getModelo());
+        vehiculo.setAnio(vehiculoActualizado.getAnio());
+        vehiculo.setEstado(vehiculoActualizado.getEstado());
         vehiculo.setImagenes(vehiculoActualizado.getImagenes());
 
         return vehiculoRepository.save(vehiculo);
@@ -67,6 +67,12 @@ public class VehiculoServiceImpl implements VehiculoService {
     @Override
     @Transactional (readOnly = true)
     public List<Vehiculo> listar() {return vehiculoRepository.findAll();}
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Vehiculo> listarActualizadosDespuesDe(LocalDateTime fecha) {
+        return vehiculoRepository.findUpdatedAfterRaw(fecha);
+    }
 
     @Override
     @Transactional(readOnly = true) // Optimizado para solo lectura
@@ -92,9 +98,15 @@ public class VehiculoServiceImpl implements VehiculoService {
     }
 
     @Override
+    @Transactional
     public void eliminar(Long id) {
+        Vehiculo vehiculo = vehiculoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Vehiculo no encontrado"));
 
-        Vehiculo vehiculo = obtenerPorId(id);
-        vehiculo.setActivo(false);
+        vehiculo.setFechaActualizacion(java.time.LocalDateTime.now());
+
+        vehiculoRepository.saveAndFlush(vehiculo);
+
+        vehiculoRepository.delete(vehiculo);
     }
 }

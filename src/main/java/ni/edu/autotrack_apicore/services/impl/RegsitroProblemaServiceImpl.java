@@ -10,6 +10,7 @@ import ni.edu.autotrack_apicore.services.VehiculoService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -38,6 +39,12 @@ public class RegsitroProblemaServiceImpl implements RegistroProblemaService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<RegistroProblema> listarActualizadoDespuesDe(LocalDateTime fecha) {
+        return problemaRepository.findUpdatedAfterRaw(fecha);
+    }
+
+    @Override
     public RegistroProblema obtenerPorId(Long id) {
         return problemaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Reporte de problema no encontrado con ID: " + id));
@@ -51,9 +58,21 @@ public class RegsitroProblemaServiceImpl implements RegistroProblemaService {
     }
 
     @Override
+    public RegistroProblema actualizar(Long id, RegistroProblema registroProblema) {
+        RegistroProblema problema = obtenerPorId(id);
+        problema.setFechaRegistro(registroProblema.getFechaRegistro());
+        problema.setNota(registroProblema.getNota());
+        problema.setAfectaVehiculo(registroProblema.getAfectaVehiculo());
+        problema.setTipoProblema(registroProblema.getTipoProblema());
+        return problemaRepository.save(problema);
+    }
+
+    @Override
     public boolean esVehiculoAptoParaCircular(Long vehiculoId) {
         // Si tiene 1 o más problemas activos que "afectan al vehículo", no es apto para andar en calle
         long problemasGraves = problemaRepository.countByVehiculoIdAndActivoTrueAndAfectaVehiculoTrue(vehiculoId);
         return problemasGraves == 0;
     }
+
+
 }

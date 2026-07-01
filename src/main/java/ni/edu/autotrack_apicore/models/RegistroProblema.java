@@ -14,9 +14,7 @@ import ni.edu.autotrack_apicore.models.enums.TipoProblema;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegistroProblema extends Registro{
-    @Column(name = "activo", nullable = false)
-    private Boolean activo = true;
-
+    
     @Column(name = "afecta_vehiculo", nullable = false)
     private Boolean afectaVehiculo;
 

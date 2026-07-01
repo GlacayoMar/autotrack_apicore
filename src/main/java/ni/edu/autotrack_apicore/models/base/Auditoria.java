@@ -32,6 +32,7 @@ public abstract class Auditoria {
     @PrePersist
     protected void prePersist() {
         fechaCreacion = LocalDateTime.now();
+        fechaActualizacion = LocalDateTime.now();
         activo = true;
     }
 
