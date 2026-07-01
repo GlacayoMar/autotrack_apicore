@@ -44,6 +44,10 @@ El backend está organizado bajo una arquitectura limpia en capas dentro del paq
 ```text
 ni.edu.autotrack_apicore/
 │
+├── config/
+│   ├── ApplicationConfig.java
+│   ├── SecurityConfig.java
+│
 ├── controllers/          # Capa de Exposición: Endpoints REST (Controllers) que reciben las peticiones de Android.
 │   ├── RegistroCombustibleController.java
 │   ├── RegistroGeneralController.java
@@ -52,25 +56,46 @@ ni.edu.autotrack_apicore/
 │   ├── VehiculoController.java
 │   └── ...
 │
+├── dto/                 # Capa de Transferencia de Datos:
+│   ├── request/         # Cuerpo o estructura de los datos enviados por los clientes atraves de los endpoints.
+│   │   ├── UsuarioRequestDTO
+│   │   └──  ...
+│   ├── response/        # Cuerpo o estructura de los datos devueltos por los endpoints.
+│   │   ├── UsuarioResponseDTO
+│   │   └──  ...
+│   ├── sync/            # Cuerpo o estructura de los datos enviados de manera sincrona o asincrona por los endpoints.
+│   │   ├── UsuarioSyncDTO
+│   │   └──  ...
+│   ├── AuthenticationResponse.java
+│   └── LoginRequest.java
+│
+│
 ├── models/               # Capa de Dominio: Entidades JPA mapeadas directamente a tablas de PostgreSQL.
-│   ├── base/             # Contiene la clase EntidadBase (IDs, Auditoría).
+│   ├── base/             # Contiene la clase EntidadBase y Auditoria (IDs, fechas de creacion y actualizacion).
 │   ├── enums/            # Enumeraciones lógicas globales (Estado, TipoProblema).
 │   ├── Usuario.java      # Relación @OneToMany hacia Vehiculo.
 │   ├── Vehiculo.java     # Relación @ManyToOne hacia Usuario y @OneToMany hacia Registro.
 │   ├── Registro.java     # Clase abstracta con estrategia de herencia JOINED.
 │   └──  ...
-
+│
 ├── repositories/         # Capa de Acceso a Datos: Interfaces que extienden JpaRepository para queries SQL automáticas.
 │   ├── UsuarioRepository.java
 │   ├── VehiculoRepository.java
 │   └── RegistroRepository.java
+│
+├── security/             # Capa de Seguridad: Esta se encarga de la autenticacion mediante JWT.
+│   ├── JWTAuthenticationFilter.java
+│   └── JWTService.java
 │
 ├── seeder/               # Laboratorio de Pruebas: Lógica del poblamiento automático (Exclusivo perfil DEV).
 │   └── DataSeeder.java
 │
 └── services/             # Capa de Negocio: Interfaces y lógica de implementaciones (impl/).
     ├── impl/             # Implementaciones concretas de la lógica de negocio.
-    └── UsuarioService.java
+    │   ├── UsuarioServiceImpl.java
+    │   └──  ...
+    ├── UsuarioService.java
+    └──  ...
     
 🚀 Automatización y Comandos en Ubuntu
 El proyecto utiliza Gradle como gestor de dependencias. Para simplificar el arranque del entorno de pruebas, se utiliza el script bash automatizado run-dev.sh.
