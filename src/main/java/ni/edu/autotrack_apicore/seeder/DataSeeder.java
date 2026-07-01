@@ -110,6 +110,8 @@ public class DataSeeder implements CommandLineRunner {
         String[] marcas = {"Toyota", "Hyundai", "Kia", "Suzuki, Honda"};
         //long contador = 300000;  *dejalo por si acaso te da problemas el faker al correr el ambiente de prueba*
 
+        Estado[] estadoVehiculo = Estado.values();
+
         for (Usuario usuario : usuarios) {
             int randomCars = faker.number().numberBetween(1, 4);
             for (int j = 0; j < randomCars; j++) {
@@ -121,7 +123,9 @@ public class DataSeeder implements CommandLineRunner {
                 // Y aqui abajo contador++;
                 v.setVin(faker.vehicle().vin()); // este no me ha dado problemas pero si lo hace pues aplicas lo mismo del contador
 
-                v.setEstado(Estado.CHUQUITI);
+                if (estadoVehiculo.length > 0) {
+                    v.setEstado(estadoVehiculo[faker.number().numberBetween(0, estadoVehiculo.length)]);
+                }
 
                 v.setUsuario(usuario);
                 vehiculos.add(v);
