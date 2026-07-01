@@ -2,6 +2,7 @@ package ni.edu.autotrack_apicore.services.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import ni.edu.autotrack_apicore.models.Registro;
 import ni.edu.autotrack_apicore.models.ServicioMantenimiento;
 import ni.edu.autotrack_apicore.models.Vehiculo;
 import ni.edu.autotrack_apicore.repositories.ServicioMantenimientoRepository;
@@ -82,6 +83,12 @@ public class ServicioMantenimientoImpl implements ServicioMantenimientoService{
         existente.setTipo(servicioActualizado.getTipo());
 
         return mantenimientoRepository.save(existente);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ServicioMantenimiento> listarActualizadosDespuesDe(LocalDateTime fecha) {
+        return mantenimientoRepository.findUpdatedAfter(fecha);
     }
 
     @Override
