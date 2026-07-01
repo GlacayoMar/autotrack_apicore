@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Component
-@Profile("dev")
+@Profile({"dev", "staging"})
 public class DataSeeder implements CommandLineRunner {
 
     private final UsuarioRepository usuarioRepository;
