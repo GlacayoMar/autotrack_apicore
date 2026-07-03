@@ -39,7 +39,6 @@ public class RegsitroProblemaServiceImpl implements RegistroProblemaService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<RegistroProblema> listarActualizadoDespuesDe(LocalDateTime fecha) {
         return problemaRepository.findUpdatedAfterRaw(fecha);
     }
@@ -58,6 +57,7 @@ public class RegsitroProblemaServiceImpl implements RegistroProblemaService {
     }
 
     @Override
+    @Transactional
     public RegistroProblema actualizar(Long id, RegistroProblema registroProblema) {
         RegistroProblema problema = obtenerPorId(id);
         problema.setFechaRegistro(registroProblema.getFechaRegistro());
