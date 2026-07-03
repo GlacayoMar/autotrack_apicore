@@ -17,5 +17,7 @@ public interface RegistroService {
 
     List<Registro> listarActualizadosDespuesDe(LocalDateTime fecha);
 
+    Registro actualizar(Long id, Registro registro);
+
     void eliminar(Long id);
 }

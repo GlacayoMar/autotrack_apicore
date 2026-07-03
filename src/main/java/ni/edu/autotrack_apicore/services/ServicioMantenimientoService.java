@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ServicioMantenimientoService {
-    ServicioMantenimiento crear(Long vehiculoId, ServicioMantenimiento servicio);
+    ServicioMantenimiento crear(ServicioMantenimiento servicio);
 
     ServicioMantenimiento obtenerPorId(Long id);
 

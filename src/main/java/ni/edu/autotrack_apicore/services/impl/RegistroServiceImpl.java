@@ -49,6 +49,15 @@ public class RegistroServiceImpl implements RegistroService {
     }
 
     @Override
+    public Registro actualizar(Long id, Registro registroActualizado) {
+        Registro registro = obtenerPorId(id);
+        registro.setFechaRegistro(registroActualizado.getFechaRegistro());
+        registro.setNota(registroActualizado.getNota());
+        registro.setFechaActualizacion(java.time.LocalDateTime.now());
+        return registroRepository.save(registro);
+    }
+
+    @Override
     @Transactional
     public void eliminar(Long id) {
         Registro registro = registroRepository.findById(id)

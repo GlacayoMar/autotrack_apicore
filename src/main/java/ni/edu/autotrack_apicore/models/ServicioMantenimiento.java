@@ -23,7 +23,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SoftDelete(columnName = "eliminado", strategy = SoftDeleteType.DELETED)
-public class ServicioMantenimiento extends EntidadBase {
+public class    ServicioMantenimiento extends EntidadBase {
 
     @Column(name = "titulo_servicio", nullable = false, length = 100)
     private String titulo;
