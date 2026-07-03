@@ -19,4 +19,5 @@ public class ServicioMantenimientoResponseDTO {
     private String observaciones;
     private TipoMantenimiento tipoMantenimiento;
     private Long vehiculoId;
+    private LocalDateTime fechaAgendada;
 }

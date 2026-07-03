@@ -6,6 +6,7 @@ import ni.edu.autotrack_apicore.dto.request.ServicioMantenimientoRequestDTO;
 import ni.edu.autotrack_apicore.dto.response.ServicioMantenimientoResponseDTO;
 import ni.edu.autotrack_apicore.dto.sync.ServicioMantenimientoSyncDTO;
 import ni.edu.autotrack_apicore.models.ServicioMantenimiento;
+import ni.edu.autotrack_apicore.models.Vehiculo;
 import ni.edu.autotrack_apicore.services.ServicioMantenimientoService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -25,11 +26,10 @@ public class ServicioMantenimientoController {
 
     @PostMapping
     public ResponseEntity<ServicioMantenimientoResponseDTO> crear(
-            @PathVariable Long vehiculoId,
             @Valid @RequestBody ServicioMantenimientoRequestDTO dto) {
 
         ServicioMantenimiento entidad = convertToEntity(dto);
-        ServicioMantenimiento nuevoServicio = servicioMantenimientoService.crear(vehiculoId, entidad);
+        ServicioMantenimiento nuevoServicio = servicioMantenimientoService.crear(entidad);
         return ResponseEntity.status(HttpStatus.CREATED).body(convertToDTO(nuevoServicio));
     }
 
@@ -126,6 +126,13 @@ public class ServicioMantenimientoController {
         entity.setDistanciaAgendada(dto.getDistanciAgendada());
         entity.setObservaciones(dto.getObservaciones());
         entity.setTipo(dto.getTipoMantenimiento());
+        entity.setFechaAgendada(dto.getFechaAgendada());
+
+        if (dto.getVehiculoId() != null) {
+            Vehiculo vehiculo = new Vehiculo();
+            vehiculo.setId(dto.getVehiculoId());
+            entity.setVehiculo(vehiculo);
+        }
         // Nota: La fechaAgendada se asume mapeada si tu RequestDTO cuenta con ella
         return entity;
     }
@@ -143,6 +150,7 @@ public class ServicioMantenimientoController {
         dto.setDistanciAgendada(entity.getDistanciaAgendada());
         dto.setObservaciones(entity.getObservaciones());
         dto.setTipoMantenimiento(entity.getTipo());
+        dto.setFechaAgendada(entity.getFechaAgendada());
 
         // Mapeo seguro del ID relacional para evitar NullPointerException si la entidad se recupera sin vehículo
         if (entity.getVehiculo() != null) {

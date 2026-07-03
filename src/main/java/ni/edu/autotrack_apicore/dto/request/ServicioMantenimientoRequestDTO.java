@@ -3,6 +3,8 @@ package ni.edu.autotrack_apicore.dto.request;
 import lombok.Data;
 import ni.edu.autotrack_apicore.models.enums.TipoMantenimiento;
 
+import java.time.LocalDateTime;
+
 @Data
 public class ServicioMantenimientoRequestDTO {
     private String titulo;
@@ -13,4 +15,5 @@ public class ServicioMantenimientoRequestDTO {
     private String observaciones;
     private TipoMantenimiento tipoMantenimiento;
     private Long vehiculoId;
+    private LocalDateTime fechaAgendada;
 }

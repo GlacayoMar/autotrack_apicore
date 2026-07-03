@@ -23,10 +23,10 @@ public class ServicioMantenimientoImpl implements ServicioMantenimientoService{
     private final VehiculoRepository vehiculoRepository;
 
     @Override
-    public ServicioMantenimiento crear(Long vehiculoId, ServicioMantenimiento servicio) {
+    public ServicioMantenimiento crear(ServicioMantenimiento servicio) {
         // Validamos que el vehículo exista antes de asignarlo
-        Vehiculo vehiculo = vehiculoRepository.findById(vehiculoId)
-                .orElseThrow(() -> new EntityNotFoundException("Vehículo no encontrado con ID: " + vehiculoId));
+        Vehiculo vehiculo = vehiculoRepository.findById(servicio.getVehiculo().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Vehículo no encontrado con ID: " + servicio.getId()));
 
         servicio.setVehiculo(vehiculo);
 
